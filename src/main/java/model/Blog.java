@@ -42,4 +42,13 @@ public class Blog {
     public void setContent(String content) {
         Content = content;
     }
+
+    @Override
+    public String toString() {
+        return "Blog{" +
+                "id=" + id +
+                ", title='" + title + '\'' +
+                ", Content='" + Content + '\'' +
+                '}';
+    }
 }

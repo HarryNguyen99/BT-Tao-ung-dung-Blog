@@ -2,14 +2,16 @@ package controller;
 
 import model.Blog;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 import service.BlogService;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.Optional;
+
 
 @Controller
 @RequestMapping("/")
@@ -19,12 +21,30 @@ public class BlogController {
     BlogService blogService;
 
     @GetMapping()
-    public ModelAndView showlistBlog(){
-        List<Blog> bloglist = blogService.findAll();
+
+//    public ModelAndView phantrang() {
+//        return showlistBlog(new PageRequest(0,1));
+//    }
+//
+//    public ModelAndView showlistBlog( Pageable pageable){
+//        Page<Blog> bloglist = blogService.findAll(pageable);
+//        ModelAndView modelAndView = new ModelAndView("list");
+//        modelAndView.addObject("bloglists", bloglist);
+//        return modelAndView;
+//    }
+
+    public ModelAndView showlistBlog(@RequestParam(defaultValue = "0") int page,
+                                     @RequestParam(defaultValue = "1") int size){
+        Pageable pageable = new PageRequest(page,size);
+        Page<Blog> bloglist = blogService.findAll(pageable);
         ModelAndView modelAndView = new ModelAndView("list");
         modelAndView.addObject("bloglists", bloglist);
         return modelAndView;
     }
+
+
+
+
 
     @GetMapping("/blog/create")
     public ModelAndView creteBlog(){
@@ -36,6 +56,7 @@ public class BlogController {
     @PostMapping("/blog/save")
     public ModelAndView saveBlog(@ModelAttribute("blog") Blog blog){
         blogService.save(blog);
+        System.out.println(blog);
         ModelAndView modelAndView = new ModelAndView("create");
         modelAndView.addObject("blogs", new Blog());
         modelAndView.addObject("success","Tạo Bài Blog Thành Công");
