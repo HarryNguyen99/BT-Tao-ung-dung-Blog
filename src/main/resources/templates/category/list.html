@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head th:replace="layout::header">
+    <meta charset="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <title>List</title>
+</head>
+<body>
+<h1>List Category</h1>
+<p>
+    <a th:href="@{/}">
+        Back To Home
+    </a>
+</p>
+<p>
+    <a th:href="@{/category/create}">
+        Add new Category
+    </a>
+</p>
+<div>
+    <p>Here you can see a list of Category:</p>
+    <div id="sCategoryFromResponse"></div>
+</div>
+<table id="blog">
+    <thead>
+    <tr>
+        <th>id</th>
+        <th>categoryName</th>
+        <th colspan="2" style="text-align: center">Action</th>
+    </tr>
+    </thead>
+    <tbody>
+    <th:block  th:each="c :${categoryLists}">
+        <tr>
+            <td th:text="${c.id}"></td>
+            <td><a th:href="@{/category/{id}/(id=${c.getId()})}" th:text="${c.categoryName}"></a></td>
+            <td><a th:href="@{/category/edit/__${c.id}__ }">Edit</a></td>
+            <td><a th:href="@{/category/delete/__${c.id}__ }">Delete</a></td>
+        </tr>
+    </th:block>
+    </tbody>
+</table>
+<div>
+    <a th:href="@{/category/list(page=${categoryLists.number - 1})}" th:if="${categoryLists.hasPrevious()}">Previous</a>
+    <span th:text=" ${categoryLists.number + 1}"></span>/<span th:text="${categoryLists.totalPages}"></span>
+    <a th:href="@{/category/list(page=${categoryLists.number + 1})}" th:if="${categoryLists.hasNext()}">Next</a>
+</div>
+<footer th:replace="layout::footer"></footer>
+<script type="text/javascript">
+    $(document).ready(function () {
+        let deleteLink = $("a:contains('Delete')");
+        $(deleteLink).click(function (event) {
+            $.ajax({
+                url: $(event.target).attr("href"),
+                type: "DELETE",
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader("Accept", "application/json");
+                    xhr.setRequestHeader("Content-Type", "application/json");
+
+                },
+                success: function (category) {
+                    var respContent = "";
+                    var rowToDelete = $(event.target).closest("tr");
+                    rowToDelete.remove();
+                    respContent += "<span class='success'>Category was deleted: [";
+                    respContent += category.id + " : ";
+                    respContent += category.categoryName + "]</span>";
+                    $("#sCategoryFromResponse").html(respContent);
+                }
+            });
+            event.preventDefault();
+        });
+    });
+</script>
+</body>
+</html>

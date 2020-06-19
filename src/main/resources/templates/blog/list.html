@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head th:replace="layout::header">
+    <meta charset="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <title>List</title>
+</head>
+<body>
+<h1>List Blog</h1>
+<p>
+    <a th:href="@{/}">
+        Back To Home
+    </a>
+</p>
+<p>
+    <a th:href="@{/blog/create}">
+        Add new blog
+    </a>
+</p>
+<div>
+    <p>Here you can see a list of Blog:</p>
+    <div id="sBlogFromResponse"></div>
+</div>
+<form>
+    Search by first name:
+    <input name="s" type="text"/>
+    <input type="submit" value="Search"/>
+</form><br/>
+<table id="blog">
+    <thead>
+    <tr>
+        <th>id</th>
+        <th>Title</th>
+        <th>Content</th>
+        <th colspan="2" style="text-align: center">Action</th>
+    </tr>
+    </thead>
+    <tbody>
+    <th:block  th:each="b :${blogLists}">
+    <tr>
+        <td th:text="${b.id}"></td>
+        <td><a th:href="@{/blog/list/{id}/(id=${b.getId()})}" th:text="${b.title}"></a></td>
+        <td th:text="${b.content}"></td>
+        <td><a th:href="@{/blog/edit/__${b.id}__ }">Edit</a></td>
+        <td><a th:href="@{/blog/delete/__${b.id}__ }">Delete</a></td>
+    </tr>
+    </th:block>
+    </tbody>
+</table>
+<!--<div class="container">-->
+
+<!--    <button onclick="getBlogList()">Click to get blog list</button>-->
+<!--    <input id="searchName" type="text" oninput="searchBlogName()"/>-->
+
+<!--    <div id="blogList"></div>-->
+
+<!--    <button onclick="loadMore()">Load more</button>-->
+<!--    <button onclick="showLess()">Show Less</button>-->
+<!--</div>-->
+<div>
+    <a th:href="@{/blog/list/(page=${blogLists.number - 1})}" th:if="${blogLists.hasPrevious()}">Previous</a>
+    <span th:text=" ${blogLists.number + 1}"></span>/<span th:text="${blogLists.totalPages}"></span>
+    <a th:href="@{/blog/list/(page=${blogLists.number + 1})}" th:if="${blogLists.hasNext()}">Next</a>
+</div>
+<footer th:replace="layout::footer"></footer>
+<script type="text/javascript">
+    $(document).ready(function () {
+        let deleteLink = $("a:contains('Delete')");
+        $(deleteLink).click(function (event) {
+            $.ajax({
+                url: $(event.target).attr("href"),
+                type: "DELETE",
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader("Accept", "application/json");
+                    xhr.setRequestHeader("Content-Type", "application/json");
+
+                },
+                success: function (blog) {
+                    var respContent = "";
+                    var rowToDelete = $(event.target).closest("tr");
+                    rowToDelete.remove();
+                    respContent += "<span class='success'>Blog was deleted: [";
+                    respContent += blog.id + " : ";
+                    respContent += blog.title + " : ";
+                    respContent += blog.content + "]</span>";
+                    $("#sBlogFromResponse").html(respContent);
+                }
+            });
+            event.preventDefault();
+        });
+    });
+</script>
+<!--<script>-->
+
+<!--    let page = 1;-->
+<!--    let size = 2;-->
+
+<!--    const apiBaseUrl = 'http://localhost:8080';-->
+
+<!--    function loadMore() {-->
+<!--        const pageable = `?size=${size}&page=${page}`;-->
+
+<!--        $.ajax(`${apiBaseUrl}/blog` + pageable)-->
+<!--            .done(function (result) {-->
+<!--                buildUI(result.data, true);-->
+<!--                if (result.data.length >= size) {-->
+<!--                    page++;-->
+<!--                }-->
+<!--            })-->
+<!--            .fail(function (error) {-->
+<!--                console.log(error);-->
+<!--            });-->
+<!--    }-->
+
+<!--    function showLess() {-->
+<!--        $(".loadMore-" + page).hide();-->
+
+<!--        if (page > 0) {-->
+<!--            page&#45;&#45;;-->
+<!--        }-->
+<!--    }-->
+
+<!--    function searchBlogName() {-->
+<!--        page = 0;-->
+<!--        let value = $('#searchName').val();-->
+<!--        console.log(value);-->
+<!--        $.ajax(`${apiBaseUrl}/blog` + value)-->
+<!--            .done(function (result) {-->
+<!--                buildUI(result.data);-->
+<!--            })-->
+<!--            .fail(function (error) {-->
+<!--                console.log(error);-->
+<!--            });-->
+<!--    }-->
+
+<!--    function getBlogList() {-->
+<!--        page = 0;-->
+<!--        $.ajax(`${apiBaseUrl}/blog`)-->
+<!--            .done(function (result) {-->
+<!--                buildUI(result.data);-->
+<!--            })-->
+<!--            .fail(function (error) {-->
+<!--                console.log(error);-->
+<!--            });-->
+<!--    }-->
+
+<!--    function buildUI(result, isAppend) {-->
+<!--        let slDiv = document.getElementById("blogList");-->
+
+<!--        if (isAppend !== true) {-->
+<!--            slDiv.innerHTML = "";-->
+<!--        }-->
+<!--        let divRow = document.createElement("div");-->
+<!--        divRow.className = "row";-->
+
+<!--        for (let i = 0; i < result.length; i++) {-->
+<!--            let divCol = document.createElement("div");-->
+<!--            divCol.className = "col";-->
+
+<!--            divCol.innerText = result[i].name;-->
+<!--            if (isAppend === true) {-->
+<!--                divCol.classList.add("loadMore-" + page);-->
+<!--            }-->
+<!--            divRow.appendChild(divCol);-->
+<!--        }-->
+<!--        slDiv.appendChild(divRow);-->
+<!--    }-->
+<!--</script>-->
+</body>
+</html>

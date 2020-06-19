@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script
+            src="https://code.jquery.com/jquery-3.5.1.js"
+            integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc="
+            crossorigin="anonymous">
+
+    </script>
+</head>
+<body>
+<h1>Create Category</h1>
+<p>
+    <a th:href="@{/category/list}">
+        Back to category list
+    </a>
+</p>
+<div class="notify">
+    <div>
+        <p>Here you can create new Category:</p>
+        <div id="sCategoryFromResponse"></div>
+    </div>
+</div>
+<form id="newCategoryForm" th:object="${categorys}">
+<table>
+    <tr>
+        <td>Category Name: </td>
+        <td><input type="text" th:field="*{categoryName}"/></td>
+    </tr>
+    <tr>
+        <td></td>
+        <td><input type="submit" value="Save"/></td>
+    </tr>
+</table>
+</form>
+<script type="text/javascript">
+    $(document).ready(function() {
+        // funtion được gọi khi submit from có id là newBlogphoneForm
+        $('#newCategoryForm').submit(function(event) {
+            // thực hiện lấy dữ liệu từ các input tương ứng
+            let categoryName = $('#categoryName').val();
+            //gán các biến vào các trường tương ứng của đối tượng json.
+            let json = { "categoryName" : categoryName};
+            $.ajax({
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                type : "POST",
+                data: JSON.stringify(json),
+                // thực hiện truyền json theo đường dẫn "/creates"
+                url: "/category/creates",
+                success: function(category) {
+                    var respContent = "";
+                    respContent += "<span class='success'>Category was created: [";
+                    respContent += category.categoryName + "]</span>"
+                    $("#sCategoryFromResponse").html(respContent);
+                }
+            });
+            event.preventDefault();
+        });
+    });
+</script>
+</body>
+</html>

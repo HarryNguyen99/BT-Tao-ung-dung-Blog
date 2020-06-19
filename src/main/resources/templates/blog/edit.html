@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Edit Blog</title>
+    <script
+            src="https://code.jquery.com/jquery-3.5.1.js"
+            integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc="
+            crossorigin="anonymous">
+
+    </script>
+</head>
+<body>
+<h1>Edit Blog</h1>
+<p>
+    <a th:href="@{/blog/list}">
+        Back to blog list
+    </a>
+</p>
+<div>
+    <p>Here you can edit Blog info:</p>
+    <div id="sBlogFromResponse"></div>
+</div>
+<form id="editBlogPhoneForm" th:object="${blogs}">
+    <input type="hidden" name="id" th:field="*{id}">
+    <table>
+        <tr>
+            <td>Title: </td>
+            <td><input type="text" th:field="*{title}"/></td>
+        </tr>
+        <tr>
+            <td>Content: </td>
+            <td><textarea th:field="*{content}"></textarea></td>
+        </tr>
+        <tr>
+            <td></td>
+            <td><input type="submit" value="Save"/></td>
+        </tr>
+    </table>
+</form>
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('#editBlogPhoneForm').submit(function (event) {
+            let title = $('#title').val();
+            let content = $('#content').val();
+            var json = {"title":title, "content":content};
+            $.ajax({
+                url: $("#editBlogPhoneForm").attr("action"),
+                data: JSON.stringify(json),
+                type: "POST",
+
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader("Accept", "application/json");
+                    xhr.setRequestHeader("Content-Type", "application/json");
+                },
+                success: function (blog) {
+                    var respContent = "";
+
+                    respContent += "<span class='success'>Smartphone was edited: [";
+                    respContent += blog.title + " : ";
+                    respContent += blog.content + "]</span>";
+                    $("#sBlogFromResponse").html(respContent);
+                }
+            });
+            event.preventDefault();
+        });
+    });
+</script>
+</body>
+</html>

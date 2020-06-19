@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Edit Category</title>
+    <script
+            src="https://code.jquery.com/jquery-3.5.1.js"
+            integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc="
+            crossorigin="anonymous">
+
+    </script>
+</head>
+<body>
+<h1>Edit Category</h1>
+<p>
+    <a th:href="@{/category/list}">
+        Back to category list
+    </a>
+</p>
+<div>
+    <p>Here you can edit Category info:</p>
+    <div id="sCategoryFromResponse"></div>
+</div>
+<form id="editCategoryForm" th:object="${categorys}">
+    <input type="hidden" name="id" th:field="*{id}">
+    <table>
+        <tr>
+            <td>Title: </td>
+            <td><input type="text" th:field="*{categoryName}"/></td>
+        </tr>
+        <tr>
+            <td></td>
+            <td><input type="submit" value="Save"/></td>
+        </tr>
+    </table>
+</form>
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('#editCategoryForm').submit(function (event) {
+            let categoryName = $('#categoryName').val();
+            var json = {"categoryName":categoryName};
+            $.ajax({
+                url: $("#editCategoryForm").attr("action"),
+                data: JSON.stringify(json),
+                type: "PUT",
+
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader("Accept", "application/json");
+                    xhr.setRequestHeader("Content-Type", "application/json");
+                },
+                success: function (category) {
+                    var respContent = "";
+                    respContent += "<span class='success'>Category was edited: [";
+                    respContent += category.categoryName + "]</span>";
+                    $("#sCategoryFromResponse").html(respContent);
+                }
+            });
+            event.preventDefault();
+        });
+    });
+</script>
+</body>
+</html>
